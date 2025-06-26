@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mauloa Company Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            color: #333;
+            padding: 40px 30px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 3em;
+            font-weight: 300;
+            letter-spacing: -2px;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .infinity-symbol {
+            font-size: 3em;
+            color: #1e88e5;
+            font-weight: 300;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 400;
+            color: #333;
+            text-align: center;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #1e88e5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e88e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background: #1976d2;
+            transform: translateY(-50%) translateY(-1px);
+        }
+
+        .mock-data-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border-left: 3px solid #1e88e5;
+        }
+
+        .mock-data-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .mock-companies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .mock-company {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mock-company:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #1e88e5;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .company-card {
+            background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .company-industry {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e9ecef;
+        }
+
+        .detail-card h3 {
+            color: #1e88e5;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 400;
+        }
+
+        .mismatch-reasons {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mismatch-reasons h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: #856404;
+        }
+
+        .referral-summary {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .referral-summary h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            background: #1e88e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #1976d2;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1e88e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .outlook-connect {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .connect-btn {
+            background: #1e88e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .connect-btn:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <span class="logo-text">mauloa</span>
+                <span class="infinity-symbol">∞</span>
+            </div>
+            <h1>Company Inquiry Analyzer</h1>
+            <p style="text-align: center; color: #6c757d; font-size: 1em;">Extract company information from Outlook inquiries for referrals</p>
+        </div>
+
+        <div class="main-content">
+            <div class="outlook-connect">
+                <h3>📧 Outlook Integration</h3>
+                <div id="authStatus">
+                    <p>Connect to your Outlook account to analyze company inquiries. This tool will search your emails for company information and extract key details for referrals.</p>
+                    <button class="connect-btn" onclick="connectOutlook()" id="connectBtn">Connect to Outlook</button>
+                </div>
+                <div id="connectedStatus" style="display: none;">
+                    <p style="color: #28a745;">✅ Connected to Outlook successfully!</p>
+                    <p>Logged in as: <span id="userEmail"></span></p>
+                    <button class="connect-btn" onclick="disconnectOutlook()" style="background: #dc3545;">Disconnect</button>
+                </div>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Enter company name to search..." id="companySearch">
+                    <button class="search-btn" onclick="searchCompany()">Search</button>
+                </div>
+            </div>
+
+            <div class="mock-data-section">
+                <h3>📋 Demo: Try these sample companies</h3>
+                <div class="mock-companies">
+                    <div class="mock-company" onclick="loadMockCompany('TechStart Solutions')">
+                        <strong>TechStart Solutions</strong><br>
+                        <small>Software Development</small>
+                    </div>
+                    <div class="mock-company" onclick="loadMockCompany('GreenLeaf Consulting')">
+                        <strong>GreenLeaf Consulting</strong><br>
+                        <small>Management Consulting</small>
+                    </div>
+                    <div class="mock-company" onclick="loadMockCompany('Metro Logistics')">
+                        <strong>Metro Logistics</strong><br>
+                        <small>Transportation & Logistics</small>
+                    </div>
+                    <div class="mock-company" onclick="loadMockCompany('DataFlow Analytics')">
+                        <strong>DataFlow Analytics</strong><br>
+                        <small>Data Analytics</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loadingDiv" style="display: none;">
+                <div class="spinner"></div>
+                <p>Searching Outlook emails for company information...</p>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <!-- Results will be populated here -->
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                <h3>🔍 No Results Found</h3>
+                <p>No emails found for this company in your Outlook inbox.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://alcdn.msauth.net/browser/2.37.1/js/msal-browser.min.js"></script>
+    <script>
+        // Microsoft Graph API configuration
+        const msalConfig = {
+            auth: {
+                clientId: "bf4fc160-0c29-4040-b1cd-9794deff004d",
+                authority: "https://login.microsoftonline.com/common",
+                redirectUri: window.location.origin
+            },
+            cache: {
+                cacheLocation: "sessionStorage", // Changed to sessionStorage for local testing
+                storeAuthStateInCookie: false
+            }
+        };
+
+        // Microsoft Graph API scopes
+        const graphScopes = {
+            scopes: ["User.Read", "Mail.Read", "Mail.ReadBasic"]
+        };
+
+        // Initialize MSAL instance
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        let accessToken = null;
+        let userAccount = null;
+
+        // Initialize the app
+        async function initializeApp() {
+            try {
+                // Handle redirect response if returning from Microsoft login
+                const response = await msalInstance.handleRedirectPromise();
+                if (response) {
+                    userAccount = response.account;
+                    updateAuthUI(true);
+                } else {
+                    // Check if user is already signed in
+                    const accounts = msalInstance.getAllAccounts();
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        updateAuthUI(true);
+                    }
+                }
+            } catch (error) {
+                console.error("Error during initialization:", error);
+            }
+        }
+
+        // Connect to Outlook
+        async function connectOutlook() {
+            try {
+                const response = await msalInstance.loginPopup(graphScopes);
+                userAccount = response.account;
+                updateAuthUI(true);
+                
+                // Get access token for Graph API
+                const tokenRequest = {
+                    scopes: graphScopes.scopes,
+                    account: userAccount
+                };
+                
+                const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                accessToken = tokenResponse.accessToken;
+                
+            } catch (error) {
+                console.error("Login failed:", error);
+                
+                // Fallback to redirect if popup is blocked
+                if (error.name === "BrowserAuthError" && error.message.includes("popup")) {
+                    await msalInstance.loginRedirect(graphScopes);
+                } else {
+                    alert("Failed to connect to Outlook. Please try again.");
+                }
+            }
+        }
+
+        // Disconnect from Outlook
+        async function disconnectOutlook() {
+            try {
+                await msalInstance.logoutPopup();
+                userAccount = null;
+                accessToken = null;
+                updateAuthUI(false);
+            } catch (error) {
+                console.error("Logout failed:", error);
+            }
+        }
+
+        // Update authentication UI
+        function updateAuthUI(isConnected) {
+            const authStatus = document.getElementById('authStatus');
+            const connectedStatus = document.getElementById('connectedStatus');
+            const userEmailSpan = document.getElementById('userEmail');
+
+            if (isConnected && userAccount) {
+                authStatus.style.display = 'none';
+                connectedStatus.style.display = 'block';
+                userEmailSpan.textContent = userAccount.username;
+            } else {
+                authStatus.style.display = 'block';
+                connectedStatus.style.display = 'none';
+            }
+        }
+
+        // Search emails using Microsoft Graph API
+        async function searchOutlookEmails(companyName) {
+            if (!accessToken || !userAccount) {
+                throw new Error("Not authenticated with Outlook");
+            }
+
+            try {
+                // Get fresh token
+                const tokenRequest = {
+                    scopes: graphScopes.scopes,
+                    account: userAccount
+                };
+                
+                const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                accessToken = tokenResponse.accessToken;
+
+                // Search for emails containing the company name
+                const searchQuery = `$search="${companyName}"&$top=50&$select=subject,bodyPreview,from,toRecipients,receivedDateTime,body`;
+                const graphEndpoint = `https://graph.microsoft.com/v1.0/me/messages?${searchQuery}`;
+
+                const response = await fetch(graphEndpoint, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Graph API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.value || [];
+
+            } catch (error) {
+                console.error("Error searching emails:", error);
+                throw error;
+            }
+        }
+
+        // Extract company information from emails
+        function extractCompanyInfo(emails, companyName) {
+            if (!emails || emails.length === 0) {
+                return null;
+            }
+
+            // Combine all email content for analysis
+            const allContent = emails.map(email => {
+                const body = email.body?.content || email.bodyPreview || '';
+                return `Subject: ${email.subject}\n${body}`;
+            }).join('\n\n');
+
+            // Extract contact information
+            const contacts = new Set();
+            emails.forEach(email => {
+                if (email.from?.emailAddress) {
+                    contacts.add(`${email.from.emailAddress.name || 'Unknown'} (${email.from.emailAddress.address})`);
+                }
+            });
+
+            // Simple extraction patterns (in production, you'd use more sophisticated NLP)
+            const revenueMatch = allContent.match(/revenue[:\s]*\$?(\d+(?:\.\d+)?)\s*(million|M|billion|B)/i);
+            const cashFlowMatch = allContent.match(/cash\s*flow[:\s]*\$?(\d+(?:\.\d+)?)\s*(million|M)/i);
+            const employeeMatch = allContent.match(/(\d+)\s*employees/i);
+            const fundingMatch = allContent.match(/seeking[:\s]*\$?(\d+(?:\.\d+)?)\s*(million|M)/i);
+
+            // Parse revenue
+            let revenue = 'Unknown';
+            if (revenueMatch) {
+                const amount = parseFloat(revenueMatch[1]);
+                const unit = revenueMatch[2].toLowerCase();
+                revenue = unit.startsWith('b') ? `$${amount}B` : `$${amount}M`;
+            }
+
+            // Parse cash flow
+            let cashFlow = 'Unknown';
+            if (cashFlowMatch) {
+                const amount = parseFloat(cashFlowMatch[1]);
+                cashFlow = `$${amount}M`;
+            }
+
+            // Parse employees
+            let employees = 'Unknown';
+            if (employeeMatch) {
+                employees = employeeMatch[1];
+            }
+
+            // Parse funding sought
+            let fundingSought = 'Unknown';
+            if (fundingMatch) {
+                const amount = parseFloat(fundingMatch[1]);
+                fundingSought = `$${amount}M`;
+            }
+
+            // Determine industry (simple keyword matching)
+            let industry = 'Unknown';
+            const content = allContent.toLowerCase();
+            if (content.includes('consulting') || content.includes('advisory')) {
+                industry = 'Consulting Services';
+            } else if (content.includes('software') || content.includes('saas') || content.includes('technology')) {
+                industry = 'Software/Technology';
+            } else if (content.includes('logistics') || content.includes('transportation')) {
+                industry = 'Logistics/Transportation';
+            } else if (content.includes('marketing') || content.includes('advertising')) {
+                industry = 'Marketing Services';
+            }
+
+            // Calculate Mauloa fit
+            const mismatchReasons = [];
+            
+            if (revenueMatch) {
+                const revenueValue = parseFloat(revenueMatch[1]) * (revenueMatch[2].toLowerCase().startsWith('b') ? 1000 : 1);
+                if (revenueValue < 20) {
+                    mismatchReasons.push('Revenue below $20M minimum');
+                }
+            } else {
+                mismatchReasons.push('Revenue information not found');
+            }
+
+            if (cashFlowMatch) {
+                const cashFlowValue = parseFloat(cashFlowMatch[1]);
+                if (cashFlowValue < 3) {
+                    mismatchReasons.push('Cash flow below $3M minimum');
+                }
+            } else {
+                mismatchReasons.push('Cash flow information not found');
+            }
+
+            if (!content.includes('business services') && !content.includes('consulting') && !content.includes('professional services')) {
+                mismatchReasons.push('Not clearly in business services sector');
+            }
+
+            return {
+                name: companyName,
+                industry: industry,
+                revenue: revenue,
+                cashFlow: cashFlow,
+                employees: employees,
+                fundingSought: fundingSought,
+                contact: {
+                    name: Array.from(contacts)[0]?.split(' (')[0] || 'Unknown',
+                    email: Array.from(contacts)[0]?.match(/\(([^)]+)\)/)?.[1] || 'Unknown',
+                    phone: 'Not found in emails'
+                },
+                keyMetrics: {
+                    'Annual Revenue': revenue,
+                    'Cash Flow': cashFlow,
+                    'Gross Margin': 'Not specified',
+                    'Employee Count': employees,
+                    'Years in Business': 'Not specified',
+                    'Funding Sought': fundingSought
+                },
+                mismatchReasons: mismatchReasons,
+                emailSnippet: emails[0]?.bodyPreview?.substring(0, 200) + '...' || 'No preview available',
+                lastContact: emails[0]?.receivedDateTime ? new Date(emails[0].receivedDateTime).toLocaleDateString() : 'Unknown'
+            };
+        }
+
+        // Updated search function to use real Outlook data
+        async function searchCompany() {
+            const companyName = document.getElementById('companySearch').value.trim();
+            if (!companyName) {
+                alert('Please enter a company name');
+                return;
+            }
+
+            if (!accessToken || !userAccount) {
+                alert('Please connect to Outlook first');
+                return;
+            }
+            
+            await loadCompanyData(companyName);
+        }
+
+        // Updated load company data function
+        async function loadCompanyData(companyName) {
+            // Show loading
+            document.getElementById('loadingDiv').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+
+            try {
+                // Search real Outlook emails
+                const emails = await searchOutlookEmails(companyName);
+                
+                document.getElementById('loadingDiv').style.display = 'none';
+                
+                if (emails && emails.length > 0) {
+                    const companyInfo = extractCompanyInfo(emails, companyName);
+                    displayCompanyResults(companyInfo);
+                } else {
+                    // Fall back to mock data if no emails found
+                    const company = mockCompanies[companyName];
+                    if (company) {
+                        displayCompanyResults(company);
+                    } else {
+                        document.getElementById('noResults').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading company data:', error);
+                document.getElementById('loadingDiv').style.display = 'none';
+                
+                // Fall back to mock data on error
+                const company = mockCompanies[companyName];
+                if (company) {
+                    displayCompanyResults(company);
+                } else {
+                    alert('Error accessing Outlook emails. Please try again.');
+                }
+            }
+        }
+
+        // Mock data for demonstration (kept for fallback)
+        const mockCompanies = {
+            'TechStart Solutions': {
+                name: 'TechStart Solutions',
+                industry: 'Software Development',
+                revenue: '$8M',
+                cashFlow: '$1.2M',
+                employees: 45,
+                fundingSought: '$5M',
+                contact: {
+                    name: 'Sarah Johnson',
+                    email: 'sarah.johnson@techstartsolutions.com',
+                    phone: '(555) 123-4567'
+                },
+                keyMetrics: {
+                    'Annual Revenue': '$8M',
+                    'Cash Flow': '$1.2M',
+                    'Gross Margin': '65%',
+                    'Employee Count': '45',
+                    'Years in Business': '6',
+                    'Funding Sought': '$5M'
+                },
+                mismatchReasons: [
+                    'Revenue below $20M minimum',
+                    'Cash flow below $3M minimum',
+                    'Not in business services focus area'
+                ],
+                emailSnippet: 'We are seeking growth capital to expand our software development capabilities and enter new markets. Our SaaS platform has shown strong growth...',
+                lastContact: '2025-06-20'
+            },
+            'GreenLeaf Consulting': {
+                name: 'GreenLeaf Consulting',
+                industry: 'Management Consulting',
+                revenue: '$35M',
+                cashFlow: '$2.8M',
+                employees: 120,
+                fundingSought: '$15M',
+                contact: {
+                    name: 'Michael Chen',
+                    email: 'mchen@greenleafconsult.com',
+                    phone: '(555) 987-6543'
+                },
+                keyMetrics: {
+                    'Annual Revenue': '$35M',
+                    'Cash Flow': '$2.8M',
+                    'Gross Margin': '42%',
+                    'Employee Count': '120',
+                    'Years in Business': '12',
+                    'Funding Sought': '$15M'
+                },
+                mismatchReasons: [
+                    'Cash flow below $3M minimum',
+                    'Gross margin below 40% target'
+                ],
+                emailSnippet: 'GreenLeaf Consulting specializes in sustainability and operational efficiency consulting for Fortune 500 companies. We are looking for a strategic partner...',
+                lastContact: '2025-06-22'
+            },
+            'Metro Logistics': {
+                name: 'Metro Logistics',
+                industry: 'Transportation & Logistics',
+                revenue: '$25M',
+                cashFlow: '$4.2M',
+                employees: 85,
+                fundingSought: '$20M',
+                contact: {
+                    name: 'Robert Wilson',
+                    email: 'rwilson@metrologistics.com',
+                    phone: '(555) 456-7890'
+                },
+                keyMetrics: {
+                    'Annual Revenue': '$25M',
+                    'Cash Flow': '$4.2M',
+                    'Gross Margin': '35%',
+                    'Employee Count': '85',
+                    'Years in Business': '15',
+                    'Funding Sought': '$20M'
+                },
+                mismatchReasons: [
+                    'Not in business services focus area',
+                    'Asset-heavy business model'
+                ],
+                emailSnippet: 'Metro Logistics provides last-mile delivery solutions for e-commerce companies. We have built a strong network across the Eastern seaboard...',
+                lastContact: '2025-06-25'
+            },
+            'DataFlow Analytics': {
+                name: 'DataFlow Analytics',
+                industry: 'Data Analytics Services',
+                revenue: '$18M',
+                cashFlow: '$3.8M',
+                employees: 65,
+                fundingSought: '$12M',
+                contact: {
+                    name: 'Lisa Zhang',
+                    email: 'lzhang@dataflowanalytics.com',
+                    phone: '(555) 234-5678'
+                },
+                keyMetrics: {
+                    'Annual Revenue': '$18M',
+                    'Cash Flow': '$3.8M',
+                    'Gross Margin': '55%',
+                    'Employee Count': '65',
+                    'Years in Business': '8',
+                    'Funding Sought': '$12M'
+                },
+                mismatchReasons: [
+                    'Revenue below $20M minimum'
+                ],
+                emailSnippet: 'DataFlow Analytics helps enterprise clients extract insights from their data through advanced analytics and machine learning solutions...',
+                lastContact: '2025-06-24'
+            }
+        };
+
+        // Updated mock company loader
+        function loadMockCompany(companyName) {
+            document.getElementById('companySearch').value = companyName;
+            
+            // If connected to Outlook, search real emails, otherwise use mock data
+            if (accessToken && userAccount) {
+                loadCompanyData(companyName);
+            } else {
+                // Use mock data
+                const company = mockCompanies[companyName];
+                if (company) {
+                    document.getElementById('loadingDiv').style.display = 'block';
+                    document.getElementById('resultsSection').style.display = 'none';
+                    document.getElementById('noResults').style.display = 'none';
+                    
+                    setTimeout(() => {
+                        document.getElementById('loadingDiv').style.display = 'none';
+                        displayCompanyResults(company);
+                    }, 1000);
+                }
+            }
+        }
+
+        function displayCompanyResults(company) {
+            const resultsSection = document.getElementById('resultsSection');
+            
+            const mismatchReasonsHtml = company.mismatchReasons.map(reason => 
+                `<div class="reason-item">❌ ${reason}</div>`
+            ).join('');
+
+            const referralSummary = generateReferralSummary(company);
+
+            resultsSection.innerHTML = `
+                <div class="company-card">
+                    <h2 class="company-name">${company.name}</h2>
+                    <p class="company-industry">${company.industry}</p>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h3>📊 Financial Metrics</h3>
+                        ${Object.entries(company.keyMetrics).map(([key, value]) => 
+                            `<div class="detail-item">
+                                <span class="detail-label">${key}:</span>
+                                <span class="detail-value">${value}</span>
+                            </div>`
+                        ).join('')}
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>👤 Contact Information</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">${company.contact.name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${company.contact.email}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">${company.contact.phone}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Contact:</span>
+                            <span class="detail-value">${company.lastContact}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mismatch-reasons">
+                    <h3>⚠️ Why Not a Fit for Mauloa</h3>
+                    ${mismatchReasonsHtml}
+                </div>
+
+                <div class="referral-summary">
+                    <h3>📋 Referral Summary</h3>
+                    <textarea id="referralText" rows="8" style="width: 100%; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">${referralSummary}</textarea>
+                    <button class="copy-btn" onclick="copyReferralSummary()">Copy to Clipboard</button>
+                </div>
+            `;
+
+            resultsSection.style.display = 'block';
+        }
+
+        function generateReferralSummary(company) {
+            return `REFERRAL OPPORTUNITY: ${company.name}
+
+Company: ${company.name}
+Industry: ${company.industry}
+Contact: ${company.contact.name} (${company.contact.email}, ${company.contact.phone})
+
+Key Metrics:
+• Annual Revenue: ${company.keyMetrics['Annual Revenue']}
+• Cash Flow: ${company.keyMetrics['Cash Flow']}
+• Employees: ${company.keyMetrics['Employee Count']}
+• Funding Sought: ${company.keyMetrics['Funding Sought']}
+• Years in Business: ${company.keyMetrics['Years in Business']}
+
+Business Overview:
+${company.emailSnippet}
+
+Why not a fit for Mauloa:
+${company.mismatchReasons.map(reason => `• ${reason}`).join('\n')}
+
+This company may be a good fit for investors focused on ${company.industry.toLowerCase()} or those with different size/criteria requirements.
+
+Last contacted: ${company.lastContact}`;
+        }
+
+        function copyReferralSummary() {
+            const textArea = document.getElementById('referralText');
+            textArea.select();
+            document.execCommand('copy');
+            alert('Referral summary copied to clipboard!');
+        }
+
+        // Allow Enter key to search
+        document.getElementById('companySearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCompany();
+            }
+        });
+
+        // Initialize the app when page loads
+        window.addEventListener('load', initializeApp);
+    </script>
+</body>
+</html>
